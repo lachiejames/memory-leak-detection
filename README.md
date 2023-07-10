@@ -1,46 +1,39 @@
-# Docker Express React End-to-End Testing with GitHub Actions
+# Memory Leak Detection with Docker and GitHub Actions
 
-This repository contains a sample Express and React application setup using Docker and Docker Compose, with end-to-end tests using Playwright and a Continuous Integration pipeline using GitHub Actions.
+This repository demonstrates an automated approach to detect memory leaks in Docker containers using a GitHub Actions workflow. It leverages the `scripts/checkForMemoryLeaks.ts` script that checks for memory leaks in your code, which is run as part of an end-to-end (E2E) testing pipeline using GitHub Actions.
 
 ## Overview
 
-The repository demonstrates the following:
+Detecting memory leaks in software applications is a significant challenge in software development. Memory leaks can degrade the performance of an application over time and can lead to system crashes. To tackle this issue, this repository provides a GitHub Actions workflow that utilizes Docker containers and a custom Node.js script for automated memory leak detection during the E2E testing process.
 
-- Dockerizing Express and React applications
-- Building a local environment with Docker Compose
-- Implementing end-to-end tests using Playwright
-- Building a GitHub Actions pipeline for automated CI testing
+## How It Works
 
-## Repository Structure
+1. **`scripts/checkForMemoryLeaks.ts` Script**: This Node.js script checks the memory usage of a Docker container before and after the E2E tests. If the final memory usage exceeds a certain threshold (50% by default), the script flags a potential memory leak and halts the process. The script takes three command-line arguments: the Docker container's name, its initial memory usage, and its final memory usage.
 
-The repository is structured as follows:
+2. **`.github/workflows/e2e-tests.yml` Workflow**: This GitHub Actions workflow orchestrates the process. It records the initial memory usage of the Docker containers, runs the E2E tests, and then records the final memory usage. These values are then fed to the `scripts/checkForMemoryLeaks.ts` script for analysis.
 
-- `/express-app`: Contains the Express backend application and its Dockerfile.
-- `/react-app`: Contains the React frontend application and its Dockerfile.
-- `/e2e`: Contains the Playwright end-to-end tests and its Dockerfile.
-- `docker-compose.yml`: Docker Compose file for setting up the local environment.
-- `.github/workflows/e2e-tests.yml`: GitHub Actions workflow for executing the end-to-end tests.
+The workflow also prepares and uploads the logs of all containers as an artifact. This facilitates debugging and helps in identifying issues during the E2E tests.
 
-## Usage
+## Getting Started
 
-To run the local environment, use the following command:
+To use this workflow in your project, follow these steps:
 
-```bash
-docker compose up
-```
+1. Install Docker and GitHub CLI on your local machine.
+2. Clone this repository: `gh repo clone <repository-url>`.
+3. Navigate into the repository's directory: `cd <repository-name>`.
+4. Adjust the script and workflow files according to your project's specific needs.
+5. Push the changes to your repository.
 
-To build the end-to-end tests image:
+Remember to replace the container names in the `CONTAINERS_TO_MEM_CHECK` and `CONTAINERS_TO_LOG` environment variables in the `.github/workflows/e2e-tests.yml` file with the names of your own Docker containers.
 
-```bash
-docker build -t playwright_tests ./e2e
-```
+## Limitations
 
-To run the end-to-end tests:
+Although this solution provides an automated approach to detect memory leaks, it does have certain limitations:
 
-```bash
-docker run --name playwright_tests --network=host playwright_tests yarn e2etest:ci
-```
+- **Possible False Alarms**: The script might produce false positives (flagging normal memory usage increases as leaks) or false negatives (missing actual memory leaks).
+- **Memory Threshold Balance**: The threshold for memory usage increase should be carefully chosen. A high threshold could miss minor leaks, whereas a low threshold might lead to frequent false alarms.
+- **Variations in Memory Management**: Memory management in Docker containers can vary depending on the technology stack of your application, which might affect the accuracy of this solution.
 
 ## Further Reading
 
-For a detailed guide on how this setup works and how to integrate it into your own projects, check my blog post [Elevate Your CI/CD: Dockerized E2E Tests with GitHub Actions](https://lachiejames.com/elevate-your-ci-cd-dockerized-e2e-tests-with-github-actions/?preview_id=2048&preview_nonce=3477eacf8a&preview=true&_thumbnail_id=2072). The post explains each step of the process and provides additional context and explanation.
+For a detailed guide on how this setup works and how to integrate it into your own projects, check my blog post [Automating Memory Leak Detection: Improve Your Dockerized CI Pipelines Now](https://lachiejames.com/automating-memory-leak-detection-improve-your-dockerized-ci-pipelines-now/). The post explains each step of the process and provides additional context and explanation.
