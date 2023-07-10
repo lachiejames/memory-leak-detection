@@ -1,0 +1,9 @@
+**/node_modules/**
+**/build/**
+**/dist/**
+**/coverage/**
+**/.vscode/**
+
+#test reports
+e2e-report
+e2e-test-results/

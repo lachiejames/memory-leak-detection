@@ -1,0 +1,26 @@
+# Specifies the version of the Docker Compose file format. This is version 3.
+version: "3"
+
+# Describes the services to be created.
+services:
+  # Defines the first service, express-app.
+  express-app:
+    # Sets a custom container name. This is useful for easy identification of running containers.
+    container_name: express-app
+    # Specifies the build context directory and Dockerfile location.
+    build:
+      context: ./express-app
+    # Maps port 5000 of the container to port 5000 on the host machine.
+    ports:
+      - 5000:5000
+
+  # Defines the second service, react-app.
+  react-app:
+    # Sets a custom container name.
+    container_name: react-app
+    # Specifies the build context directory and Dockerfile location.
+    build:
+      context: ./react-app
+    # Maps port 3000 of the container to port 3000 on the host machine.
+    ports:
+      - 3000:3000
